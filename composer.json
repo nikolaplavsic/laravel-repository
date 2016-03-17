@@ -1,0 +1,23 @@
+{
+    "name": "nplavsic/laravel-repository",
+    "description": "",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nikola Plavsic",
+            "email": "nikolaplavsic@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "NPlavsic\\LRepository\\": "src"
+        }
+    },
+    "minimum-stability": "dev"
+}
