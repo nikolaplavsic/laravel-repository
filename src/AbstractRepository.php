@@ -190,6 +190,24 @@ abstract class AbstractRepository implements RepositoryContract
 	}
 
 	/**
+	 * Check if its transaction method
+	 * 
+	 * @param string 	$method - domain method name
+	 * 
+	 * @return boolean
+	 */
+	public function isTransactionMethod($method)
+	{
+		// if method is defined as transaction method or all methods are transactional
+		if( $this->transactionMethods == null || (is_array($this->transactionMethods) && in_array($method, $this->transactionMethods) ) )
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Proxy function through which domain methods will be called
 	 * This method should be overridden in extending classes
 	 * 
@@ -236,7 +254,7 @@ abstract class AbstractRepository implements RepositoryContract
 	protected function beforeProxy($method, $args)
 	{
 		// if method is defined as transaction method
-		if( is_array($this->transactionMethods) && in_array($method, $this->transactionMethods) )
+		if( $this->isTransactionMethod($method) )
 		{
 			// begin transaction
 			$this->db->beginTransaction();
@@ -254,7 +272,7 @@ abstract class AbstractRepository implements RepositoryContract
 	protected function failedProxy($method, $args, $e)
 	{
 		// if method is defined as transaction method
-		if( is_array($this->transactionMethods) && in_array($method, $this->transactionMethods) )
+		if( $this->isTransactionMethod($method) )
 		{
 			// begin transaction
 			$this->db->rollBack();
@@ -272,12 +290,14 @@ abstract class AbstractRepository implements RepositoryContract
 	protected function afterProxy($method, $args, $result)
 	{
 		// if method is defined as transaction method
-		if( is_array($this->transactionMethods) && in_array($method, $this->transactionMethods) )
+		if( $this->isTransactionMethod($method) )
 		{
 			// commit transaction
 			$this->db->commit();
 		}
 	}
+
+
 
 	/**
 	 * DB INSERT of object
@@ -292,7 +312,7 @@ abstract class AbstractRepository implements RepositoryContract
 		$args = func_get_args();
 
 		// proxy call
-		$result = $this->proxy('_create', $args);
+		$result = $this->proxy('create', $args);
 
 		// if($this->shouldUseCache())
 		// {
@@ -316,7 +336,7 @@ abstract class AbstractRepository implements RepositoryContract
 		$args = func_get_args();
 
 		// proxy call
-		$result = $this->proxy('_update', $args);
+		$result = $this->proxy('update', $args);
 
 		// if($this->shouldUseCache())
 		// {
@@ -340,7 +360,7 @@ abstract class AbstractRepository implements RepositoryContract
 		$args = func_get_args();
 
 		// proxy call
-		$result = $this->proxy('_delete', $args);
+		$result = $this->proxy('delete', $args);
 
 		// if($this->shouldUseCache())
 		// {
@@ -365,7 +385,7 @@ abstract class AbstractRepository implements RepositoryContract
 		$args = func_get_args();
 		
 		// proxy call
-		$result = $this->proxy('_fetch', $args);
+		$result = $this->proxy('fetch', $args);
 
 		return $result;
 
@@ -401,7 +421,7 @@ abstract class AbstractRepository implements RepositoryContract
 		$args = func_get_args();
 
 		// proxy call
-		$result = $this->proxy('_filter', $args);
+		$result = $this->proxy('filter', $args);
 
 		return $result;
 		
@@ -579,6 +599,6 @@ abstract class AbstractRepository implements RepositoryContract
 
 	abstract protected function _fetch($id);
 
-	abstract protected function _get($filter = [], $offset = 0, $limit = 0, $sort = []);
+	abstract protected function _filter($filter = [], $offset = 0, $limit = 0, $sort = []);
 
 }
